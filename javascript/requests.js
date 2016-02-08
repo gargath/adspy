@@ -11,7 +11,12 @@ var total_width = window.innerWidth;
 $( document ).ready(function() {
   console.log("Doc is ready");
   $("#leftpane").resizable({
-      handles: "e"
+      handles: "e",
+      create: function( event, ui ) {
+      // Prefers an another cursor with two arrows
+        $(".ui-resizable-e").css("cursor","ew-resize");
+        $(".ui-resizable-e").css("width","15px");
+      }
   }).bind( "resize", resize_other);
 });
 
