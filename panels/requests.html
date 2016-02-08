@@ -1,4 +1,4 @@
-<html>
+<html style="width:100%; height:100%; padding:0; margin: 0;">
 <head>
 <link rel="stylesheet" href="/vendor/jquery-ui.css">
 <link rel="stylesheet" href="/vendor/jstree/themes/default/style.css">
@@ -7,11 +7,21 @@
 <script src="/javascript/requests.js"></script>
 <script src="/vendor/jstree/jstree.js"></script>
 </head>
-<body>
-<div id="requestlog">Test</div>
-<div id="button" ><button class="mybutton">Create Tree</button></div>
-<div id="button" ><button class="addTreeButton">Clear Tree</button></div>
-<div id="button" ><button class="backgroundbutton">Call Background</button></div>
-<div id="jstree_demo"></div>
+<body style="width: 100%; height: 100%; position: relative; padding: 0; margin: 0;">
+    <div width="100%" height="100%" style="margin-left: auto; margin-right: auto; border: 1px solid red; overflow: auto; display:flex;">
+        <div style="font-size: 12px; flex:auto; flex-direction: row; width: 50%; height: 100%; border: 1px solid black; overflow: scroll" id="leftpane">
+
+            <div>
+                <div id="requestlog">Test</div>
+                <div id="button" ><button class="mybutton">Create Tree</button></div>
+                <div id="button" ><button class="addTreeButton">Clear Tree</button></div>
+                <div id="button" ><button class="backgroundbutton">Call Background</button></div>
+                <div id="jstree_demo"></div>
+            </div>
+        </div>
+        <div style="font-size: 12px; flex:auto; flex-direction: row; width: 50%; height: 100%; border: 1px solid black;" id="rightpane">
+Lore Ipsum...
+        </div>
+    </div>
 </body>
 </html>

@@ -6,6 +6,27 @@ port.onMessage.addListener(function(msg) {
   console.log("Listener on request: " + msg);
 });
 
+
+var total_width = window.innerWidth;
+$( document ).ready(function() {
+  console.log("Doc is ready");
+  $("#leftpane").resizable({
+      handles: "e"
+  }).bind( "resize", resize_other);
+});
+
+function resize_other(event, ui) {
+    var width = $("#leftpane").width();
+    
+    if(width > total_width) {
+        width = total_width;
+        
+        $('#leftpane').css('width', width);
+    }
+    
+    $('#rightpane').css('width', (total_width - width));
+}
+
 (function() {
 
 function listen() {
@@ -31,11 +52,11 @@ function listen() {
   
   chrome.devtools.network.onRequestFinished.addListener(
     function(request) {
-      console.log("Request URL: "+request.request.url);
       var the_tree = $('#jstree_demo').jstree(true);
+      console.log("Tree: " + the_tree);
       count++;
       node_id = the_tree.create_node("1",{'id':count, 'text':(count-1)+' '+request.request.url});
-      the_tree.get_node(node_id).css("color","red");
+      //the_tree.get_node(node_id).css("color","red");
       the_tree.open_node("1");
     }
   );
