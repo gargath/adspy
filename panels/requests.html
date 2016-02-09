@@ -6,21 +6,80 @@
 <script src="/vendor/jquery-ui.js"></script>
 <script src="/javascript/requests.js"></script>
 <script src="/vendor/jstree/jstree.js"></script>
+<style>
+
+div.header:before { 
+    content: "";
+    background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAD8GlDQ1BJQ0MgUHJvZmlsZQAAOI2NVd1v21QUP4lvXKQWP6Cxjg4Vi69VU1u5GxqtxgZJk6XpQhq5zdgqpMl1bhpT1za2021Vn/YCbwz4A4CyBx6QeEIaDMT2su0BtElTQRXVJKQ9dNpAaJP2gqpwrq9Tu13GuJGvfznndz7v0TVAx1ea45hJGWDe8l01n5GPn5iWO1YhCc9BJ/RAp6Z7TrpcLgIuxoVH1sNfIcHeNwfa6/9zdVappwMknkJsVz19HvFpgJSpO64PIN5G+fAp30Hc8TziHS4miFhheJbjLMMzHB8POFPqKGKWi6TXtSriJcT9MzH5bAzzHIK1I08t6hq6zHpRdu2aYdJYuk9Q/881bzZa8Xrx6fLmJo/iu4/VXnfH1BB/rmu5ScQvI77m+BkmfxXxvcZcJY14L0DymZp7pML5yTcW61PvIN6JuGr4halQvmjNlCa4bXJ5zj6qhpxrujeKPYMXEd+q00KR5yNAlWZzrF+Ie+uNsdC/MO4tTOZafhbroyXuR3Df08bLiHsQf+ja6gTPWVimZl7l/oUrjl8OcxDWLbNU5D6JRL2gxkDu16fGuC054OMhclsyXTOOFEL+kmMGs4i5kfNuQ62EnBuam8tzP+Q+tSqhz9SuqpZlvR1EfBiOJTSgYMMM7jpYsAEyqJCHDL4dcFFTAwNMlFDUUpQYiadhDmXteeWAw3HEmA2s15k1RmnP4RHuhBybdBOF7MfnICmSQ2SYjIBM3iRvkcMki9IRcnDTthyLz2Ld2fTzPjTQK+Mdg8y5nkZfFO+se9LQr3/09xZr+5GcaSufeAfAww60mAPx+q8u/bAr8rFCLrx7s+vqEkw8qb+p26n11Aruq6m1iJH6PbWGv1VIY25mkNE8PkaQhxfLIF7DZXx80HD/A3l2jLclYs061xNpWCfoB6WHJTjbH0mV35Q/lRXlC+W8cndbl9t2SfhU+Fb4UfhO+F74GWThknBZ+Em4InwjXIyd1ePnY/Psg3pb1TJNu15TMKWMtFt6ScpKL0ivSMXIn9QtDUlj0h7U7N48t3i8eC0GnMC91dX2sTivgloDTgUVeEGHLTizbf5Da9JLhkhh29QOs1luMcScmBXTIIt7xRFxSBxnuJWfuAd1I7jntkyd/pgKaIwVr3MgmDo2q8x6IdB5QH162mcX7ajtnHGN2bov71OU1+U0fqqoXLD0wX5ZM005UHmySz3qLtDqILDvIL+iH6jB9y2x83ok898GOPQX3lk3Itl0A+BrD6D7tUjWh3fis58BXDigN9yF8M5PJH4B8Gr79/F/XRm8m241mw/wvur4BGDj42bzn+Vmc+NL9L8GcMn8F1kAcXgSteGGAAAAbUlEQVQ4Ee3SQQoAIQgFUJuL6c31Zk7O4CZCNNzN/E1F8Ah/Q2egMVej9VA/+E6UiEBEzsZrLa+ZkjWviKjMvF6HZ9jdOuhrBU6BFbgEZuD2f1h6YWaWKTADebkhWIFC8ARycNhmtteW9pY/CN4fDxENjB3pdAAAAABJRU5ErkJggg==') no-repeat 0 0;
+    background-size: 100%;
+    display: block;
+    height: 1em;
+    width: 1em;
+    left: -1em;
+    top: 1em;
+    position: relative;
+}
+div.header.open:before { 
+    content: "";
+    background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAIAAAAC64paAAAAAXNSR0IArs4c6QAAAHxJREFUOBHVk8EJACEMBPVqSiFaqYVoT7n1I6JZD3Iv85Ks44SAUVWDtx4v2LlL4YCFzZVSYltANN/EeYVrrQxG9AEjNuW71jCjZcp3rQ3vclNL4UVuaik8y5n2BA850wKO/QFSOWckpRSShxPcWgMmIh6YMaN/6a/6NfYLMaRjaIga7gkAAAAASUVORK5CYII=') no-repeat 0 0;
+    background-size: 100%;
+    display: block;
+    height: 1em;
+    width: 1em;
+    left: -1em;
+    top: 1em;
+    position: relative;
+}
+    
+</style>
 </head>
 <body style="width: 100%; height: 100%; position: relative; padding: 0; margin: 0;">
     <div width="100%" height="100%" style="margin-left: auto; margin-right: auto; overflow: auto; display:flex;">
-        <div style="font-size: 12px; flex:auto; flex-direction: row; width: 50%; height: 100%; border-right: 1px solid black; overflow: scroll; padding:5px; margin: 15px;" id="leftpane">
+        <div style="font-size: 12px; flex:auto; flex-direction: row; width: 100%; height: 100%; overflow: scroll; padding:0px; margin:0px;" id="leftpane">
 
             <div>
                 <div id="requestlog">Test</div>
-                <div id="button" ><button class="mybutton">Create Tree</button></div>
                 <div id="button" ><button class="addTreeButton">Clear Tree</button></div>
                 <div id="button" ><button class="backgroundbutton">Call Background</button></div>
-                <div id="jstree_demo"></div>
+                <div id="jstree"></div>
             </div>
         </div>
-        <div style="font-size: 12px; flex:auto; flex-direction: row; width: 50%; height: 100%; padding:5px;z-index:-1" id="rightpane">
-Lore Ipsum...
+        <div style="font-size: 12px; flex:auto; flex-direction: row; width: 50%; height: 100%; padding:5px; border-left: 1px solid black; display: none;" id="rightpane">
+            
+            <div id="tabs">
+                <ul>
+                    <li><a href="#tabs-1">Request</a></li>
+                    <li><a href="#tabs-2">Response</a></li>
+                    <li><a href="#tabs-3">Other Stuff</a></li>
+                </ul>
+                <div id="tabs-1">
+                    <div class="container">
+                        <div class="header" id="firstheader"><span>Expand</span></div>
+                        <div id="collapsed" style="display:none; padding:5px;">
+                            <ul>
+                                <li>This is just some random content.</li>
+                                <li>This is just some random content.</li>
+                                <li>This is just some random content.</li>
+                                <li>This is just some random content.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <p>
+                        <!-- Use Codemirror here -->
+                        Request No: <label id="numfield"></label><br/>
+                        URL: <label id="urlfield"></label>
+                    </p>
+                </div>
+                <div id="tabs-2">
+                    <p>Test2</p>
+                </div>
+                <div id="tabs-3">
+                    <p>Test3</p>
+                </div>
+            </div>
+            
+            
+
         </div>
     </div>
 </body>
