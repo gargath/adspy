@@ -1,8 +1,9 @@
-<html style="width:100%; height:100%; padding:0; margin: 0;">
+<html>
 <head>
 <link rel="stylesheet" href="/vendor/jquery-ui.css">
 <link rel="stylesheet" href="/vendor/jstree/themes/default/style.css">
 <link rel="stylesheet" href="/vendor/codemirror/codemirror.css">
+<link rel="stylesheet" href="/vendor/codemirror/addons/simplescrollbars.css">
 
 <link rel="stylesheet" href="/style/adspy.css">
 
@@ -14,13 +15,14 @@
 <script src="/vendor/codemirror/mode/css/css.js"></script>
 <script src="/vendor/codemirror/mode/xml/xml.js"></script>
 <script src="/vendor/codemirror/addons/active-line.js"></script>
+<script src="/vendor/codemirror/addons/simplescrollbars.js"></script>
 
 <script src="/javascript/requests.js"></script>
 <script src="/javascript/requests-ui.js"></script>
 </head>
-<body style="width: 100%; height: 100%; position: relative; padding: 0; margin: 0;">
-    <div width="100%" height="100%" style="margin-left: auto; margin-right: auto; overflow: auto; display:flex;">
-        <div style="font-size: 12px; flex:auto; flex-direction: row; width: 100%; height: 100%; overflow: scroll; padding:5px; margin:5px; z-index:1;" id="leftpane">
+<body>
+    <div width="100%" height="100%" class="adspy-flexbox">
+        <div class="adspy-flexpane-left" id="leftpane">
 
             <div>
                 <div id="requestlog">Test</div>
@@ -29,7 +31,7 @@
                 <div id="jstree"></div>
             </div>
         </div>
-        <div style="font-size: 12px; flex:auto; flex-direction: row; width: 50%; height: 100%; padding:5px; border-left: 1px solid black; display: none; overflow: scroll;" id="rightpane">
+        <div class="adspy-flexpane-right" id="rightpane">
             
             <div id="tabs">
                 <ul>
@@ -46,7 +48,7 @@
                     </p>
                     <div class="container">
                         <div class="header" id="firstheader"><span>Expand</span></div>
-                        <div id="collapsed" style="display:none; padding:5px;">
+                        <div class="collapsed" id="collapsed">
                             <ul>
                                 <li>This is just some random content.</li>
                                 <li>This is just some random content.</li>
