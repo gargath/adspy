@@ -28,21 +28,25 @@ $( document ).ready(function() {
   tree();
   $('#jstree').on("select_node.jstree", function (e, data) {
     if (data.node.id != 1) {
-      var req = findRequestById(data.node.id).raw_request;
+      var req = findRequestById(data.node.id-1);
       console.log("Request is:");
       console.log(req);
-      $('#rightpane').show();
+      if ($( "#rightpane" ).is( ":hidden" )) {
+        $('#rightpane').show();
+        $('#tabs').tabs({active: 1});
+      }
       $('#numfield').text(req.id);
-      $('#urlfield').text(req.request.url);
-      req.getContent(function(content, encoding) {
+      $('#urlfield').text(req.raw_request.request.url);
+      req.raw_request.getContent(function(content, encoding) {
         if (!encoding) {
           console.log("Setting new codemirror content");
-          myCodeMirror.swapDoc(CodeMirror.Doc(content, req.response.content.mimeType));
+          myCodeMirror.swapDoc(CodeMirror.Doc(content, req.raw_request.response.content.mimeType));
         }
         else {
           console.log("Content is encoded. Clearing codemirror document.");
           myCodeMirror.swapDoc(CodeMirror.Doc(""));
         }
+        myCodeMirror.refresh();
       });
     }
   });
@@ -57,10 +61,14 @@ $( document ).ready(function() {
   });
 
   $('#tabs').tabs({
+    active: 1,
     activate: function(event, ui) {
       console.log(event);
-      if (event.currentTarget.hash == "#tabs-2") {
+      if ((event.currentTarget) && (event.currentTarget.hash == "#tabs-2")) {
         myCodeMirror.refresh();
+      }
+      else if ((event.currentTarget) && (event.currentTarget.hash == "#tabs-0")) {
+        $('#rightpane').hide();
       }
     }
   });
@@ -71,6 +79,7 @@ $( document ).ready(function() {
     var nodes = the_tree.get_children_dom ("1");
     jQuery.each(nodes, function(i, val) {the_tree.delete_node(val);});
     count = 1;
+    traffic.length = 0;
   });
   
   $('.header').click(function(event) {
