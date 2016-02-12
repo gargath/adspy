@@ -11,12 +11,12 @@ body {
     position: relative;
     padding: 0;
     margin: 0;
+    overflow: hidden;
 }
 
 .adspy-flexbox {
     margin-left: auto;
     margin-right: auto;
-    overflow: auto;
     display:flex;
 }
 
@@ -26,7 +26,7 @@ body {
     flex-direction: row;
     width: 100%;
     height: 100%;
-    overflow: scroll;
+    overflow: auto;
     padding:5px;
     margin:5px;
     z-index:1;
@@ -41,7 +41,7 @@ body {
     padding:5px;
     border-left: 1px solid black;
     display: none;
-    overflow: scroll;
+    overflow: auto;
 }
 
 .collapsed {
@@ -51,10 +51,6 @@ body {
 
 .open {
     display: block;
-    padding: 5px;
-}
-
-div {
     padding: 5px;
 }
 
