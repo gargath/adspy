@@ -44,8 +44,24 @@ $( document ).ready(function() {
         $('#rightpane').show();
         $('#tabs').tabs({active: 1});
       }
-      $('#numfield').text(req.id);
+      
       $('#urlfield').text(req.raw_request.request.url);
+      $('#methfield').text(req.raw_request.request.method);
+      $('#statusfield').text(req.raw_request.response.status + " " + req.raw_request.response.statusText);
+      
+      $("#responseheaders").empty();
+      $("#requestheaders").empty();
+      $.each(req.raw_request.response.headers, function(index, header) {
+        $("#responseheaders").append(
+          "<span class=\"fieldlabel\">"+header.name+"</span> <span class=\"datafield\" id=\"header_"+index+"_field\">"+header.value+"</span><br/>"
+        )
+      });
+      $.each(req.raw_request.request.headers, function(index, header) {
+        $("#requestheaders").append(
+          "<span class=\"fieldlabel\">"+header.name+"</span> <span class=\"datafield\" id=\"header_"+index+"_field\">"+header.value+"</span><br/>"
+        )
+      });
+      
       req.raw_request.getContent(function(content, encoding) {
         if (!encoding) {
           console.log("Setting new codemirror content");

@@ -36,36 +36,26 @@
             <div id="tabs">
                 <ul>
                     <li><a href="#tabs-0">X</a></li>
-                    <li><a href="#tabs-1">Request</a></li>
+                    <li><a href="#tabs-1">Headers</a></li>
                     <li><a href="#tabs-2">Response</a></li>
                     <li><a href="#tabs-3">Other Stuff</a></li>
                 </ul>
                 <div id="tabs-1">
-                    <p>
-                        Request No: <label id="numfield"></label><br/>
-                        URL: <label id="urlfield"></label>
-                    </p>
                     <div class="container">
-                        <div class="header" id="firstheader"><span>Expand</span></div>
-                        <div class="collapsed" id="collapsed">
-                            <ul>
-                                <li>This is just some random content.</li>
-                                <li>This is just some random content.</li>
-                                <li>This is just some random content.</li>
-                                <li>This is just some random content.</li>
-                            </ul>
+                        <div class="header open" id="generalheader"><span>General</span></div>
+                        <div class="collapsed open" id="general">
+                            <span class="fieldlabel">Request URL:</span> <span class="datafield" id="urlfield"></span><br/>
+                            <span class="fieldlabel">Request Method:</span> <span class="datafield" id="methfield"></span><br/>
+                            <span class="fieldlabel">Status Code:</span> <span class="datafield" id="statusfield"></span><br/>
                         </div>
                     </div>
                     <div class="container">
-                        <div class="header" id="secondheader"><span>Expands Also</span></div>
-                        <div class="collapsed" id="collapsed_2">
-                            <ul>
-                                <li>This is just some new random content.</li>
-                                <li>This is just some new random content.</li>
-                                <li>This is just some new random content.</li>
-                                <li>This is just some new random content.</li>
-                            </ul>
-                        </div>
+                        <div class="header" id="respheader"><span>Response Headers</span></div>
+                        <div class="collapsed" id="responseheaders"></div>
+                    </div>
+                    <div class="container">
+                        <div class="header" id="reqheader"><span>Request Headers</span></div>
+                        <div class="collapsed" id="requestheaders"></div>
                     </div>
                 </div>
                 <div id="tabs-2">
