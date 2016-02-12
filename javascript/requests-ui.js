@@ -97,7 +97,7 @@ $( document ).ready(function() {
   //Add click handler to expandable header
   $('.header').click(function(event) {
     console.log("expanding " + $(this));
-    $('#collapsed').toggle();
+    $('.collapsed', $(this).parent()).toggle();
     $(this).toggleClass('open');
   });
   
