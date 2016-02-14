@@ -92,3 +92,7 @@ div.header.open:before {
     font-family: Menlo, monospace;
     font-size: 11px;
 }
+
+.redtext {
+    color: red !important;
+}

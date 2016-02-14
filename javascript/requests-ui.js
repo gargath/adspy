@@ -13,6 +13,7 @@ port.onMessage.addListener(function(msg) {
 $( window ).resize(function() {
   if (total_width != window.innerWidth) {
     total_width = window.innerWidth;
+    $("body").css('height', window.innerHeight-20);
   }
 });
 
@@ -20,7 +21,8 @@ $( window ).resize(function() {
 //Doc Ready
 $( document ).ready(function() {
   total_width = window.innerWidth;
-  
+  $("body").css('height', window.innerHeight-20);
+      
   //Make pane resizable
   $("#leftpane").resizable({
       handles: "e",
@@ -121,7 +123,12 @@ $( document ).ready(function() {
   var backgroundButton = document.querySelector('.backgroundButton');
   $('.backgroundButton').click(function() {
     console.log("Background clicked");
-    port.postMessage({joke: "Knock knock"});;
+    port.postMessage({joke: "Knock knock"});
+    var node = $('#jstree').jstree(true).get_node("3", true);
+    console.log($(node));
+    $(node).addClass("redtext");
+    $('#jstree').jstree(true).get_node(node).li_attr["class"] += " redtext";
+    $('#jstree').jstree(true).redraw();
   });
   
 });
