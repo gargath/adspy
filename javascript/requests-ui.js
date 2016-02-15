@@ -38,44 +38,42 @@ $( document ).ready(function() {
   
   //Add click handler to tree node elements
   $('#jstree').on("select_node.jstree", function (e, data) {
-    if (data.node.id != 1) {
-      var req = findRequestById(data.node.id-1);
-      console.log("Request is:");
-      console.log(req);
-      if ($( "#rightpane" ).is( ":hidden" )) {
-        $('#rightpane').show();
-        $('#tabs').tabs({active: 1});
-      }
-      
-      $('#urlfield').text(req.raw_request.request.url);
-      $('#methfield').text(req.raw_request.request.method);
-      $('#statusfield').text(req.raw_request.response.status + " " + req.raw_request.response.statusText);
-      
-      $("#responseheaders").empty();
-      $("#requestheaders").empty();
-      $.each(req.raw_request.response.headers, function(index, header) {
-        $("#responseheaders").append(
-          "<span class=\"fieldlabel\">"+header.name+"</span> <span class=\"datafield\" id=\"header_"+index+"_field\">"+header.value+"</span><br/>"
-        )
-      });
-      $.each(req.raw_request.request.headers, function(index, header) {
-        $("#requestheaders").append(
-          "<span class=\"fieldlabel\">"+header.name+"</span> <span class=\"datafield\" id=\"header_"+index+"_field\">"+header.value+"</span><br/>"
-        )
-      });
-      
-      req.raw_request.getContent(function(content, encoding) {
-        if (!encoding) {
-          console.log("Setting new codemirror content");
-          codemirrorPane.swapDoc(CodeMirror.Doc(content, req.raw_request.response.content.mimeType));
-        }
-        else {
-          console.log("Content is encoded. Clearing codemirror document.");
-          codemirrorPane.swapDoc(CodeMirror.Doc(""));
-        }
-        codemirrorPane.refresh();
-      });
+    var req = findRequestById(data.node.id);
+    console.log("Request is:");
+    console.log(req);
+    if ($( "#rightpane" ).is( ":hidden" )) {
+      $('#rightpane').show();
+      $('#tabs').tabs({active: 1});
     }
+    
+    $('#urlfield').text(req.raw_request.request.url);
+    $('#methfield').text(req.raw_request.request.method);
+    $('#statusfield').text(req.raw_request.response.status + " " + req.raw_request.response.statusText);
+    
+    $("#responseheaders").empty();
+    $("#requestheaders").empty();
+    $.each(req.raw_request.response.headers, function(index, header) {
+      $("#responseheaders").append(
+        "<span class=\"fieldlabel\">"+header.name+"</span> <span class=\"datafield\" id=\"header_"+index+"_field\">"+header.value+"</span><br/>"
+      )
+    });
+    $.each(req.raw_request.request.headers, function(index, header) {
+      $("#requestheaders").append(
+        "<span class=\"fieldlabel\">"+header.name+"</span> <span class=\"datafield\" id=\"header_"+index+"_field\">"+header.value+"</span><br/>"
+      )
+    });
+    
+    req.raw_request.getContent(function(content, encoding) {
+      if (!encoding) {
+        console.log("Setting new codemirror content");
+        codemirrorPane.swapDoc(CodeMirror.Doc(content, req.raw_request.response.content.mimeType));
+      }
+      else {
+        console.log("Content is encoded. Clearing codemirror document.");
+        codemirrorPane.swapDoc(CodeMirror.Doc(""));
+      }
+      codemirrorPane.refresh();
+    });
   });
 
   //Set up codemirror for response view

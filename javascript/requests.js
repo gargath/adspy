@@ -15,18 +15,19 @@ $(window).load(function() {
     
     the_tree = $('#jstree').jstree(true);
               
-    var wl_index;
-    if (wl_index = findWatchlistIndexByURL(request.request.url)) {
+    var wl_index = findWatchlistIndexByURL(request.request.url);
+    if (wl_index) {
       console.log("Encountered expected request:");
       console.log(watchlist[wl_index]);
-      if (watchlist[wl_index].status != "expect") {
+      if (watchlist[wl_index].status == "okay") {
         console.log("Duplicate request spotted: " + request.request.url);
       }
       else if (request.response.status == 200) {        //style
         the_tree.get_node(watchlist[wl_index].treenode, true).addClass("adspy_ok");
         the_tree.get_node(watchlist[wl_index].treenode).li_attr["class"] = the_tree.get_node(watchlist[wl_index].treenode).li_attr["class"].replace(/ adspy_.*\b/g," ");
         the_tree.get_node(watchlist[wl_index].treenode).li_attr["class"] += " adspy_ok";
-        watchlist[wl_index] = {treenode: watchlist[wl_index].treenode, url: watchlist[wl_index].url, status: "okay"}
+        watchlist[wl_index] = {treenode: watchlist[wl_index].treenode, url: watchlist[wl_index].url, status: "okay"};
+        traffic.push({id: watchlist[wl_index].treenode, raw_request: request});
       }
       else {
         console.log("Failed request?")
@@ -35,13 +36,19 @@ $(window).load(function() {
     }
     
     var content_type = getContentType(request);
-    if (content_type && content_type.indexOf("text/xml" >= 0)) {
+    if (content_type && content_type.indexOf("text/xml") >= 0) {
+      console.log(request);
       request.getContent(function(content, encoding) {
-        parsedXML = $.parseXML(content);
+        try {
+          parsedXML = $.parseXML(content);
+        }
+        catch (err) {
+          console.log("Invalid XML in text/xml response.");
+          return;
+        }
         if ($(parsedXML.children[0]).prop("tagName") == "VAST") {
           vast_node_id = the_tree.create_node("#",{'text':'[VAST] '+request.request.url, 'state':{'opened':'true'}});
           traffic.push({id: vast_node_id, raw_request: request});
-          console.log("Setting class on root node");
           the_tree.get_node(vast_node_id, true).addClass("adspy_ok");
           the_tree.get_node(vast_node_id).li_attr["class"] += " adspy_ok";
           handleVAST($(parsedXML.children), "#");
@@ -55,12 +62,13 @@ $(window).load(function() {
 
 
 function findWatchlistIndexByURL(url) {
+  var ret;
   $.each(watchlist, function(index, entry) {
     if (entry.url == url) {
-        return index;
+        ret = index;
     }
   });
-
+  return ret;
 }
 
 function findRequestById(key) {
