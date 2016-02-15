@@ -96,3 +96,12 @@ div.header.open:before {
 .redtext {
     color: red !important;
 }
+
+.adspy_expect {
+    color: #A6A6A6 !important;
+    font-style: italic !important;
+}
+.adspy_ok {
+    color: green !important;
+    font-weight: bold !important;
+}

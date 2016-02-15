@@ -153,10 +153,6 @@ function tree() {
       "animation" : 0,
       "check_callback" : true,
       "themes" : { "stripes" : true },
-      'data' : {
-	    "url" : "./root.json",
-		"dataType" : "json" // needed only if you do not supply JSON headers
-	  }
     }
   });
 }
