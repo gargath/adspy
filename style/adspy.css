@@ -118,13 +118,3 @@ div.header.open:before {
     flex: auto;
     flex-direction: column;
 }
-.toolbar-divider {
-    background-color: #ccc;
-    width: 1px;
-    margin: 2px 4px;
-    height: 16px;
-    poition: relative;
-    display: inline;
-    box-sizing: border-box;
-    color: #5a5a5a;
-}
