@@ -6,20 +6,20 @@ var watchlist = [];
 var the_tree;
 
 $(window).load(function() {
+
+  the_tree = $('#jstree').jstree(true);
+      
   chrome.devtools.network.onRequestFinished.addListener(function(request) {
     
     if (request.request.httpVersion == "unknown") {
       //preliminary request. will handle later.
         return;
     }
-    
-    the_tree = $('#jstree').jstree(true);
               
     var wl_index = findWatchlistIndexByURL(request.request.url);
     if (wl_index) {
-      console.log("Encountered expected request:");
-      console.log(watchlist[wl_index]);
       if (watchlist[wl_index].status == "okay") {
+        //TODO: Handle dupes properly, according to type
         console.log("Duplicate request spotted: " + request.request.url);
       }
       else if (request.response.status == 200) {        //style
@@ -30,7 +30,8 @@ $(window).load(function() {
         traffic.push({id: watchlist[wl_index].treenode, raw_request: request});
       }
       else {
-        console.log("Failed request?")
+        console.log("Failed request?");
+        //TODO: Handle failures
         console.log(request);
       }
     }
