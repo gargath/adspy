@@ -101,7 +101,8 @@ $( document ).ready(function() {
   });
   
   //Add click handler to button
-  $('.addTreeButton').click(function() {
+  $('#clearbutton').click(function() {
+    //TODO: Clear not only tree but also watchlist and traffic
     console.log("Clear button clicked");
     var the_tree = $('#jstree').jstree(true);
     var nodes = the_tree.get_children_dom ("1");

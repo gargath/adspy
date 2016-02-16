@@ -18,6 +18,8 @@ body {
     margin-left: auto;
     margin-right: auto;
     display:flex;
+    height: 100%;
+    width: 100%;
 }
 
 .adspy-flexpane-left {
@@ -104,4 +106,25 @@ div.header.open:before {
 .adspy_ok {
     color: green !important;
     font-weight: bold !important;
+}
+
+.toolbar {
+    background:#f2f2f2;
+    border-bottom: 1px solid black;
+    padding-top: 2px;
+    padding-left: 2px;
+    width: 100%;
+    height: 20px;
+    flex: auto;
+    flex-direction: column;
+}
+.toolbar-divider {
+    background-color: #ccc;
+    width: 1px;
+    margin: 2px 4px;
+    height: 16px;
+    poition: relative;
+    display: inline;
+    box-sizing: border-box;
+    color: #5a5a5a;
 }
