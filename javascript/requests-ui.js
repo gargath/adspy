@@ -49,6 +49,15 @@ $( document ).ready(function() {
     $('#urlfield').text(req.raw_request.request.url);
     $('#methfield').text(req.raw_request.request.method);
     $('#statusfield').text(req.raw_request.response.status + " " + req.raw_request.response.statusText);
+    if (req.warning) {
+      $("#warning_label").show();
+      $("#warning_field").show();
+      $("#warning_field").text(req.warning);
+    }
+    else {
+      $("#warning_label").hide();
+      $("#warning_field").hide();
+    }
     
     $("#responseheaders").empty();
     $("#requestheaders").empty();
@@ -105,10 +114,12 @@ $( document ).ready(function() {
     //TODO: Clear not only tree but also watchlist and traffic
     console.log("Clear button clicked");
     var the_tree = $('#jstree').jstree(true);
-    var nodes = the_tree.get_children_dom ("1");
+    var nodes = the_tree.get_children_dom ("#");
     jQuery.each(nodes, function(i, val) {the_tree.delete_node(val);});
-    count = 1;
     traffic.length = 0;
+    preliminary.length = 0;
+    watchlist.length = 0;
+    the_tree.create_node("#",{'id':'prelim', 'text':'Pending Requests', 'state':{'opened':'true'}});
   });
   
   //Add click handler to expandable header
@@ -151,7 +162,17 @@ function tree() {
     "core" : {
       "animation" : 0,
       "check_callback" : true,
-      "themes" : { "stripes" : true },
-    }
+      "themes" : { "stripes" : true }
+    },
+    "types" : {
+      "warn" : {
+        "icon" : "fa fa-exclamation-triangle"
+      },
+      "okay" : {
+        "icon" : "fa fa-check-circle adspy_ok"
+      }
+    },
+    "plugins" : [ "types" ]
   });
+  $('#jstree').jstree(true).create_node("#",{'id':'prelim', 'text':'Pending Requests', 'state':{'opened':'true'}, "type" : "warn"});
 }

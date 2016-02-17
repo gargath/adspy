@@ -2,6 +2,7 @@ var count = 1;
 
 var traffic = [];
 var watchlist = [];
+var preliminary = [];
 
 var the_tree;
 
@@ -11,29 +12,65 @@ $(window).load(function() {
       
   chrome.devtools.network.onRequestFinished.addListener(function(request) {
     
-    if (request.request.httpVersion == "unknown") {
-      //preliminary request. will handle later.
-        return;
+    if (request.response.status == 0) {
+      console.log(request);
+      node_id = the_tree.create_node('prelim', {'text':request.request.url});
+      preliminary.push({id: node_id, raw_request: request});
+      return;
+      
     }
-              
-    var wl_index = findWatchlistIndexByURL(request.request.url);
+    else {
+      var prelim_index = findListIndexByURL(preliminary, request.request.url);
+      if (prelim_index) {
+        the_tree.delete_node(preliminary[prelim_index].id);
+        preliminary.splice(prelim_index, 1);
+      }
+    }
+    
+    var wl_index = findListIndexByURL(watchlist, request.request.url);
     if (wl_index) {
       if (watchlist[wl_index].status == "okay") {
         //TODO: Handle dupes properly, according to type
         console.log("Duplicate request spotted: " + request.request.url);
       }
-      else if (request.response.status == 200) {        //style
-        the_tree.get_node(watchlist[wl_index].treenode, true).addClass("adspy_ok");
+      else if (request.response.status >= 200 && request.response.status < 400) {
+        the_tree.get_node(watchlist[wl_index].treenode, true).removeClass("adspy_expect");        
         the_tree.get_node(watchlist[wl_index].treenode).li_attr["class"] = the_tree.get_node(watchlist[wl_index].treenode).li_attr["class"].replace(/ adspy_.*\b/g," ");
-        the_tree.get_node(watchlist[wl_index].treenode).li_attr["class"] += " adspy_ok";
-        watchlist[wl_index] = {treenode: watchlist[wl_index].treenode, url: watchlist[wl_index].url, status: "okay"};
-        traffic.push({id: watchlist[wl_index].treenode, raw_request: request});
+        if (request.request.url == watchlist[wl_index].url) {
+          the_tree.get_node(watchlist[wl_index].treenode, true).addClass("adspy_ok");
+          the_tree.get_node(watchlist[wl_index].treenode).li_attr["class"] += " adspy_ok";
+          watchlist[wl_index] = {treenode: watchlist[wl_index].treenode, url: watchlist[wl_index].url, status: "okay"};
+          traffic.push({id: watchlist[wl_index].treenode, raw_request: request});
+        }
+        else {
+          var additional_params = request.request.url.replace(watchlist[wl_index].url, "");
+          the_tree.get_node(watchlist[wl_index].treenode, true).addClass("adspy_warn");
+          the_tree.get_node(watchlist[wl_index].treenode).li_attr["class"] += " adspy_warn";
+          the_tree.set_type(the_tree.get_node(watchlist[wl_index].treenode), "warn");
+          
+          watchlist[wl_index] = {treenode: watchlist[wl_index].treenode, url: watchlist[wl_index].url, status: "warn"};
+          traffic.push({id: watchlist[wl_index].treenode, raw_request: request, warning: "Request was executed with additional query parameters: " + additional_params});
+        }
+        
       }
       else {
         console.log("Failed request?");
-        //TODO: Handle failures
         console.log(request);
+        the_tree.get_node(watchlist[wl_index].treenode, true).removeClass("adspy_expect");
+        the_tree.get_node(watchlist[wl_index].treenode, true).addClass("adspy_error");
+        the_tree.get_node(watchlist[wl_index].treenode).li_attr["class"] = the_tree.get_node(watchlist[wl_index].treenode).li_attr["class"].replace(/ adspy_.*\b/g," ");
+        the_tree.get_node(watchlist[wl_index].treenode).li_attr["class"] += " adspy_error";
+        watchlist[wl_index] = {treenode: watchlist[wl_index].treenode, url: watchlist[wl_index].url, status: "error"};
+        traffic.push({id: watchlist[wl_index].treenode, raw_request: request});
       }
+    }
+    else if (request.response.status >= 400) {
+      console.log("Failed request?");
+      console.log(request);
+      node_id = the_tree.create_node('prelim', {'text':request.request.url});
+      the_tree.get_node(node_id, true).addClass("adspy_error");
+      the_tree.get_node(node_id).li_attr["class"] += " adspy_error";
+      traffic.push({id: node_id, raw_request: request});
     }
     
     var content_type = getContentType(request);
@@ -48,11 +85,10 @@ $(window).load(function() {
           return;
         }
         if ($(parsedXML.children[0]).prop("tagName") == "VAST") {
-          vast_node_id = the_tree.create_node("#",{'text':'[VAST] '+request.request.url, 'state':{'opened':'true'}});
+          vast_node_id = the_tree.create_node("#",{'text':'[VAST] '+request.request.url, 'state':{'opened':'true'}, 'type' : 'okay'});
+          the_tree.move_node(the_tree.get_node('prelim'), '#', 'last');
           traffic.push({id: vast_node_id, raw_request: request});
-          the_tree.get_node(vast_node_id, true).addClass("adspy_ok");
-          the_tree.get_node(vast_node_id).li_attr["class"] += " adspy_ok";
-          handleVAST($(parsedXML.children), "#");
+          handleVAST($(parsedXML.children), vast_node_id);
         }
         console.log(watchlist);
         console.log(traffic);
@@ -62,15 +98,16 @@ $(window).load(function() {
 });
 
 
-function findWatchlistIndexByURL(url) {
+function findListIndexByURL(list, url) {
   var ret;
-  $.each(watchlist, function(index, entry) {
-    if (entry.url == url) {
+  $.each(list, function(index, entry) {
+    if (url.indexOf(entry.url) > -1) {
         ret = index;
     }
   });
   return ret;
 }
+
 
 function findRequestById(key) {
     return traffic.filter(function(element) {return element.id == key;})[0];
