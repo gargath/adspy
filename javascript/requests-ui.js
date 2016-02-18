@@ -74,6 +74,7 @@ $( document ).ready(function() {
     
     req.raw_request.getContent(function(content, encoding) {
       if (!encoding) {
+        //TODO: Check for supported mime type before setting up document
         console.log("Setting new codemirror content");
         codemirrorPane.swapDoc(CodeMirror.Doc(content, req.raw_request.response.content.mimeType));
       }
@@ -111,7 +112,6 @@ $( document ).ready(function() {
   
   //Add click handler to button
   $('#clearbutton').click(function() {
-    //TODO: Clear not only tree but also watchlist and traffic
     console.log("Clear button clicked");
     var the_tree = $('#jstree').jstree(true);
     var nodes = the_tree.get_children_dom ("#");
@@ -120,6 +120,11 @@ $( document ).ready(function() {
     preliminary.length = 0;
     watchlist.length = 0;
     the_tree.create_node("#",{'id':'prelim', 'text':'Pending Requests', 'state':{'opened':'true'}});
+  });
+  
+  $('#dumpbutton').click(function() {
+    console.log("Traffic Dump!");
+    console.log(traffic);
   });
   
   //Add click handler to expandable header
@@ -166,7 +171,7 @@ function tree() {
     },
     "types" : {
       "warn" : {
-        "icon" : "fa fa-exclamation-triangle"
+        "icon" : "fa fa-exclamation-triangle adspy_warn"
       },
       "okay" : {
         "icon" : "fa fa-check-circle adspy_ok"
