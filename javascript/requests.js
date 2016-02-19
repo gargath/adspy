@@ -4,6 +4,15 @@ var traffic = [];
 var watchlist = [];
 var preliminary = [];
 
+Array.observe(traffic, function(update) {
+  for (var i = 0; i < update[0].addedCount; i++) {
+    var req = update[0].object[update[0].index+i].raw_request.request;
+    var res = update[0].object[update[0].index+i].raw_request.response;
+    $('#timeline_table').append("<tr id=\"tb_"+update[0].object[update[0].index+i].id+"\"><td class=\"url_td\">"+req.url+"</td><td>"+res.status+"</td><td>"+req.method+"</td></tr>");
+  }
+
+});
+
 var the_tree;
 
 $(window).load(function() {
@@ -13,7 +22,6 @@ $(window).load(function() {
   chrome.devtools.network.onRequestFinished.addListener(function(request) {
     
     if (request.response.status == 0) {
-      console.log(request);
       node_id = the_tree.create_node('prelim', {'text':request.request.url});
       preliminary.push({id: node_id, raw_request: request});
       return;
@@ -75,7 +83,6 @@ $(window).load(function() {
     
     var content_type = getContentType(request);
     if (content_type && content_type.indexOf("text/xml") >= 0) {
-      console.log(request);
       request.getContent(function(content, encoding) {
         try {
           parsedXML = $.parseXML(content);
@@ -90,8 +97,6 @@ $(window).load(function() {
           traffic.push({id: vast_node_id, raw_request: request});
           handleVAST($(parsedXML.children), vast_node_id);
         }
-        console.log(watchlist);
-        console.log(traffic);
       });
     }
   });  

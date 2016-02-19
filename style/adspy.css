@@ -14,6 +14,10 @@ body {
     overflow: hidden;
 }
 
+.hidden {
+    display:none;
+}
+
 .adspy-flexbox {
     margin-left: auto;
     margin-right: auto;
@@ -93,6 +97,9 @@ div.warning:before {
     top: 1em;
     position: relative;
 }
+div.warning.hidden:before {
+    display: none;
+}
 
 .header {
     cursor: default !important;
@@ -135,6 +142,25 @@ div.warning:before {
     font-weight: bold !important;
 }
 
+#timeline_table {
+    font-family:'Helvetica Neue', 'Lucida Grande', sans-serif;
+    font-size: 12px;
+}
+#timeline_table td {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    padding: 5px;
+}
+#timeline_table tr {
+    cursor: pointer;
+}
+#timeline_table tr:nth-child(odd) {
+    background-color: #eeeeee;
+}
+#timeline_table .url_td {
+    max-width: 500px;
+}
 
 
 .toolbar {
@@ -146,4 +172,11 @@ div.warning:before {
     height: 20px;
     flex: auto;
     flex-direction: column;
+    vertical-align: middle;
+}
+
+.toolbar .fa {
+    height: 20px;
+    width: 20px;
+    vertical-align: 3px;
 }

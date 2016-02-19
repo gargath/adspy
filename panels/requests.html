@@ -27,13 +27,15 @@
         <img src="/style/icons/clear.png" id="clearbutton"></img>
         <img src="/style/icons/on.png"></img>
         <img src="/style/icons/warn.png" id="dumpbutton"></img>
+        <img src="/style/icons/tree.png" id="viewbutton"></img>
+        <a id="downloadButton"><i class="fa fa-download fa-lg"></i></a>
     </div>
     <div class="adspy-flexbox">
         <div class="adspy-flexpane-left" id="leftpane">
 
             <div>
-                <div id="button" ><button class="backgroundbutton">Call Background</button></div>
                 <div id="jstree"></div>
+                <div id="timeline" class="hidden"><table id="timeline_table"></table></div>
             </div>
         </div>
         <div class="adspy-flexpane-right" id="rightpane">
@@ -62,7 +64,7 @@
                         <div class="header" id="reqheader"><span>Request Headers</span></div>
                         <div class="collapsed" id="requestheaders"></div>
                     </div>
-                    <div class="warning">
+                    <div class="warning" id="warning_box">
                         <span class="fieldlabel" id="warning_label">Warning:</span> <span class="datafield" id="warning_field"></span><br/>
                     </div>
                 </div>

@@ -5,7 +5,7 @@
   "options_page" : "panels/options.html",
   "devtools_page" : "panels/devtools.html",
   "background": {
-    "scripts": ["javascript/background.js"]
+    "scripts": ["vendor/jquery-2.2.0.js", "javascript/background.js"]
   },
   "description": "AdSpy with my little eye something beginning with VAST",
   "version": "1.0",
