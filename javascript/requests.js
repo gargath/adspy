@@ -29,19 +29,20 @@ $(window).load(function() {
     }
     else {
       var prelim_index = findListIndexByURL(preliminary, request.request.url);
-      if (prelim_index) {
+      if (prelim_index > -1) {
         the_tree.delete_node(preliminary[prelim_index].id);
         preliminary.splice(prelim_index, 1);
       }
     }
     
     var wl_index = findListIndexByURL(watchlist, request.request.url);
-    if (wl_index) {
+    if (wl_index > -1) {
       if (watchlist[wl_index].status == "okay") {
         //TODO: Handle dupes properly, according to type
         console.log("Duplicate request spotted: " + request.request.url);
       }
       else if (request.response.status >= 200 && request.response.status < 400) {
+        console.log("...and it was okay");
         the_tree.get_node(watchlist[wl_index].treenode, true).removeClass("adspy_expect");        
         the_tree.get_node(watchlist[wl_index].treenode).li_attr["class"] = the_tree.get_node(watchlist[wl_index].treenode).li_attr["class"].replace(/ adspy_.*\b/g," ");
         if (request.request.url == watchlist[wl_index].url) {
@@ -84,6 +85,11 @@ $(window).load(function() {
     var content_type = getContentType(request);
     if (content_type && content_type.indexOf("text/xml") >= 0) {
       request.getContent(function(content, encoding) {
+        if (encoding) {
+            console.log("Base64 response. Will handle later...");
+            return;
+        }
+        var parsedXML;
         try {
           parsedXML = $.parseXML(content);
         }
@@ -99,15 +105,48 @@ $(window).load(function() {
         }
       });
     }
+    else if (content_type && content_type.indexOf("application/json") >=0) {
+      request.getContent(function(content, encoding) {
+        var vptp;
+        try {
+          vptp = JSON.parse(content);
+        }
+        catch (err) {
+          console.log("Invalid JSON in application/json response.");
+          console.log(request);
+          return;
+        }
+        if (vptp.insertionPoint) {
+          console.log("Parsed response:");
+          console.log(vptp);
+          var ads = [];
+          ads.push(JSON.parse(vptp.insertionPoint[0].slot[0].vast.ad[0].inLine.creatives.creative[0].linear.adParameters.value));
+          console.log(ads);
+          vptp_node_id = the_tree.create_node("#",{'text':'[VPTP] '+request.request.url, 'state':{'opened':'true'}, 'type' : 'okay'});
+          traffic.push({id: vptp_node_id, raw_request: request});
+          handleVPTP(vptp, vptp_node_id);
+        }
+      });
+    }
   });  
 });
 
 
 function findListIndexByURL(list, url) {
-  var ret;
+  var ret = -1;
+  if (url.indexOf("rnd=") > -1) {
+    url = url.replace(/(\?|&)rnd=[^&]*($|&)/, function(match, g1, g2) {
+      if (g1 == "&") {
+        return g2;
+      }
+      else {
+        return g1;
+      }
+    });
+  }
   $.each(list, function(index, entry) {
     if (url.indexOf(entry.url) > -1) {
-        ret = index;
+      ret = index;
     }
   });
   return ret;
@@ -125,6 +164,16 @@ function getContentType(request) {
   })[0];
   if (obj) { return obj.value }
   else { return undefined; }
+}
+
+function handleVPTP(vptp, node_id) {
+  if (vptp.trackingEvents) {
+    tracking_node_id = the_tree.create_node(node_id,{ 'text':'[TRACKING]', 'state':{'opened':'true'}});
+    $.each(vptp.trackingEvents.tracking, function(index,obj) {
+      event_node_id = the_tree.create_node(tracking_node_id,{ 'text':'['+obj.event+'] '+obj.value, });
+      expectURL(event_node_id, obj.value);
+    });
+  }
 }
 
 function handleVAST(nodeSet, parent_node_id) {
@@ -160,7 +209,18 @@ function handleVAST(nodeSet, parent_node_id) {
 }
 
 function expectURL(tree_node_id, url) {
-    watchlist.push({treenode: node_id, url: url, status: "expect"});
-    $('#jstree').jstree(true).get_node(tree_node_id, true).addClass("adspy_expect");
-    $('#jstree').jstree(true).get_node(tree_node_id).li_attr["class"] += " adspy_expect";
+  if (url.indexOf("rnd=") > -1) {
+    url = url.replace(/(\?|&)rnd=[^&]*($|&)/, function(match, g1, g2) {
+      if (g1 == "&") {
+        return g2;
+      }
+      else {
+        return g1;
+      }
+    });    
+  }
+  console.log("Expecting URL " + url);
+  watchlist.push({treenode: tree_node_id, url: url, status: "expect"});
+  $('#jstree').jstree(true).get_node(tree_node_id, true).addClass("adspy_expect");
+  $('#jstree').jstree(true).get_node(tree_node_id).li_attr["class"] += " adspy_expect";
 }
