@@ -1,5 +1,5 @@
 chrome.devtools.panels.create(
-    'AdSpy',
+    'VASTly',
     null, // No icon path
     '/panels/requests.html',
     null // no callback needed

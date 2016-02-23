@@ -167,18 +167,57 @@ function getContentType(request) {
 }
 
 function handleVPTP(vptp, node_id) {
+  if (vptp.insertionPoint) {
+    $.each(vptp.insertionPoint, function(index,point) {
+      condition = point.conditions.condition[0].name;
+      ip_node_id = the_tree.create_node(node_id,{ 'text':'[INSERTION POINT '+index+']', 'state':{'opened':'true'}});
+      $.each(point.slot, function(sindex,slot) {
+        slot_node_id = the_tree.create_node(ip_node_id,{ 'text':'[SLOT '+index+']', 'state':{'opened':'true'}});
+        //slot vast
+        $.each(slot.vast.ad, function(aindex,ad) {
+          var adobj;
+          if (ad.inLine.creatives.creative[0]) {
+            try {
+              adobj = JSON.parse(ad.inLine.creatives.creative[0].linear.adParameters.value);
+            }
+            catch (err) {
+              console.log("Invalid JSON inside ad object. This should not happen...");
+              console.log(err);
+              return;
+            }
+            console.log("Parsed this:");
+            console.log(adobj);
+            ad_node_id = the_tree.create_node(slot_node_id,{ 'text':'['+condition+'] '+'some_ad'});
+          }
+        });
+        
+        //slot tracking
+        st_node_id = the_tree.create_node(ip_node_id,{ 'text':'[SLOT TRACKING]', 'state':{'opened':'true'}});
+        console.log("Slot is currently:");
+        console.log(slot);
+        $.each(slot.trackingEvents.tracking, function(tindex,event) {
+          t_node_id = the_tree.create_node(st_node_id,{ 'text':'['+event.event+'] '+ event.value});
+          expectURL(t_node_id, event.value);
+        });
+      });
+    });
+  }
   if (vptp.trackingEvents) {
-    tracking_node_id = the_tree.create_node(node_id,{ 'text':'[TRACKING]', 'state':{'opened':'true'}});
+    tracking_node_id = the_tree.create_node(node_id,{ 'text':'[GLOBAL TRACKING]', 'state':{'opened':'true'}});
     $.each(vptp.trackingEvents.tracking, function(index,obj) {
       event_node_id = the_tree.create_node(tracking_node_id,{ 'text':'['+obj.event+'] '+obj.value, });
       expectURL(event_node_id, obj.value);
     });
   }
+
 }
 
 function handleVAST(nodeSet, parent_node_id) {
   nodeSet.each(function(i) {
     tagname = $(nodeSet[i]).prop("tagName").toUpperCase();
+    
+    //if (tagname == "AD") { //Handle Multiple Ads in same response }
+    
     if ((tagname == "CREATIVES") || (tagname == "MEDIAFILES") || (tagname == "TRACKINGEVENTS") || (tagname == "VIDEOCLICKS")) {
       node_id = the_tree.create_node(parent_node_id,{ 'text':'['+tagname+']', 'state':{'opened':'true'}});
     }
