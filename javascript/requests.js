@@ -307,7 +307,7 @@ function handleVAST(nodeSet, parent_node_id) {
 }
 
 function expectURL(tree_node_id, url) {
-  if (url == "") {
+  if (!url) {
     console.log("Refusing to watch for emtpy URL");
     return;
   }
