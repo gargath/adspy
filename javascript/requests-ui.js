@@ -145,6 +145,20 @@ $( document ).ready(function() {
     console.log(traffic);
     console.log("Dumping Watchlist!");
     console.log(watchlist);
+    console.log("Tree Dump!");
+    var the_tree = $('#jstree').jstree(true);
+    console.log(the_tree);
+    selected = the_tree.get_selected(true);
+    if (selected.length > 0) {
+      console.log(selected[0]);
+      url = selected[0].text.replace(/.*(?=http)/,"");
+      console.log(url);
+      console.log("Watchlist entry:");
+      console.log(findListIndexByURL(watchlist, url));
+      console.log("Traffic entry:");
+      console.log(findListIndexByURL(traffic, url));
+    }
+
   });
   
   //Add click handler to expandable header
@@ -193,6 +207,15 @@ function tree() {
       },
       "okay" : {
         "icon" : "fa fa-check-circle adspy_ok"
+      },
+      "preroll" : {
+        "icon" : "/images/preroll.png"
+      },
+      "midroll" : {
+        "icon" : "/images/midroll.png"
+      },
+      "postroll" : {
+        "icon" : "/images/postroll.png"
       }
     },
     "plugins" : [ "types" ]

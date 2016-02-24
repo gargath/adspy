@@ -42,22 +42,26 @@ $(window).load(function() {
         console.log("Duplicate request spotted: " + request.request.url);
       }
       else if (request.response.status >= 200 && request.response.status < 400) {
-        console.log("...and it was okay");
-        the_tree.get_node(watchlist[wl_index].treenode, true).removeClass("adspy_expect");        
-        the_tree.get_node(watchlist[wl_index].treenode).li_attr["class"] = the_tree.get_node(watchlist[wl_index].treenode).li_attr["class"].replace(/ adspy_.*\b/g," ");
+        $.each(watchlist[wl_index].treenode, function(nodeindex, node) {
+          the_tree.get_node(node, true).removeClass("adspy_expect");        
+          the_tree.get_node(node).li_attr["class"] = the_tree.get_node(node).li_attr["class"].replace(/ adspy_.*\b/g," ");
+        });
         if (request.request.url == watchlist[wl_index].url) {
-          the_tree.get_node(watchlist[wl_index].treenode, true).addClass("adspy_ok");
-          the_tree.get_node(watchlist[wl_index].treenode).li_attr["class"] += " adspy_ok";
-          watchlist[wl_index] = {treenode: watchlist[wl_index].treenode, url: watchlist[wl_index].url, status: "okay"};
+          $.each(watchlist[wl_index].treenode, function(nodeindex, node) {
+            the_tree.get_node(node, true).addClass("adspy_ok");
+            the_tree.get_node(node).li_attr["class"] += " adspy_ok";
+          });
+          watchlist[wl_index].status =  "okay";
           traffic.push({id: watchlist[wl_index].treenode, raw_request: request});
         }
         else {
           var additional_params = request.request.url.replace(watchlist[wl_index].url, "");
-          the_tree.get_node(watchlist[wl_index].treenode, true).addClass("adspy_warn");
-          the_tree.get_node(watchlist[wl_index].treenode).li_attr["class"] += " adspy_warn";
-          the_tree.set_type(the_tree.get_node(watchlist[wl_index].treenode), "warn");
-          
-          watchlist[wl_index] = {treenode: watchlist[wl_index].treenode, url: watchlist[wl_index].url, status: "warn"};
+          $.each(watchlist[wl_index].treenode, function(nodeindex, node) {
+            the_tree.get_node(node, true).addClass("adspy_warn");
+            the_tree.get_node(node).li_attr["class"] += " adspy_warn";
+            the_tree.set_type(the_tree.get_node(node), "warn");
+          });
+          watchlist[wl_index].statut = "warn";
           traffic.push({id: watchlist[wl_index].treenode, raw_request: request, warning: "Request was executed with additional query parameters: " + additional_params});
         }
         
@@ -65,13 +69,22 @@ $(window).load(function() {
       else {
         console.log("Failed request?");
         console.log(request);
-        the_tree.get_node(watchlist[wl_index].treenode, true).removeClass("adspy_expect");
-        the_tree.get_node(watchlist[wl_index].treenode, true).addClass("adspy_error");
-        the_tree.get_node(watchlist[wl_index].treenode).li_attr["class"] = the_tree.get_node(watchlist[wl_index].treenode).li_attr["class"].replace(/ adspy_.*\b/g," ");
-        the_tree.get_node(watchlist[wl_index].treenode).li_attr["class"] += " adspy_error";
-        watchlist[wl_index] = {treenode: watchlist[wl_index].treenode, url: watchlist[wl_index].url, status: "error"};
+        $.each(watchlist[wl_index].treenode, function(nodeindex, node) {        
+          the_tree.get_node(node, true).removeClass("adspy_expect");
+          the_tree.get_node(node, true).addClass("adspy_error");
+          the_tree.get_node(node).li_attr["class"] = the_tree.get_node(node).li_attr["class"].replace(/ adspy_.*\b/g," ");
+          the_tree.get_node(node).li_attr["class"] += " adspy_error";
+        });
+        watchlist[wl_index].status = "error";
         traffic.push({id: watchlist[wl_index].treenode, raw_request: request});
       }
+      $.each(watchlist[wl_index].treenode, function(nodeindex,node) {
+        var opening_node_id = the_tree.get_parent(node);
+        while (the_tree.get_parent(opening_node_id) != '#') {
+          the_tree.open_node(opening_node_id);
+          opening_node_id = the_tree.get_parent(opening_node_id);
+        }
+      });
     }
     else if (request.response.status >= 400) {
       console.log("Failed request?");
@@ -113,15 +126,11 @@ $(window).load(function() {
         }
         catch (err) {
           console.log("Invalid JSON in application/json response.");
-          console.log(request);
           return;
         }
         if (vptp.insertionPoint) {
           console.log("Parsed response:");
           console.log(vptp);
-          var ads = [];
-          ads.push(JSON.parse(vptp.insertionPoint[0].slot[0].vast.ad[0].inLine.creatives.creative[0].linear.adParameters.value));
-          console.log(ads);
           vptp_node_id = the_tree.create_node("#",{'text':'[VPTP] '+request.request.url, 'state':{'opened':'true'}, 'type' : 'okay'});
           traffic.push({id: vptp_node_id, raw_request: request});
           handleVPTP(vptp, vptp_node_id);
@@ -132,10 +141,10 @@ $(window).load(function() {
 });
 
 
-function findListIndexByURL(list, url) {
+function findListIndexByURL(list, inurl) {
   var ret = -1;
-  if (url.indexOf("rnd=") > -1) {
-    url = url.replace(/(\?|&)rnd=[^&]*($|&)/, function(match, g1, g2) {
+  if (inurl.indexOf("rnd=") > -1) {
+    inurl = inurl.replace(/(\?|&)rnd=[^&]*($|&)/, function(match, g1, g2) {
       if (g1 == "&") {
         return g2;
       }
@@ -145,7 +154,7 @@ function findListIndexByURL(list, url) {
     });
   }
   $.each(list, function(index, entry) {
-    if (url.indexOf(entry.url) > -1) {
+    if (inurl.indexOf(entry.url) > -1) {
       ret = index;
     }
   });
@@ -170,13 +179,13 @@ function handleVPTP(vptp, node_id) {
   if (vptp.insertionPoint) {
     $.each(vptp.insertionPoint, function(index,point) {
       condition = point.conditions.condition[0].name;
-      ip_node_id = the_tree.create_node(node_id,{ 'text':'[INSERTION POINT '+index+']', 'state':{'opened':'true'}});
+      ip_node_id = the_tree.create_node(node_id,{ 'text':'[INSERTION POINT '+index+']'});
       $.each(point.slot, function(sindex,slot) {
-        slot_node_id = the_tree.create_node(ip_node_id,{ 'text':'[SLOT '+index+']', 'state':{'opened':'true'}});
+        slot_node_id = the_tree.create_node(ip_node_id,{ 'text':'[SLOT '+sindex+']'});
         //slot vast
         $.each(slot.vast.ad, function(aindex,ad) {
           var adobj;
-          if (ad.inLine.creatives.creative[0]) {
+          if (ad.inLine.creatives) {
             try {
               adobj = JSON.parse(ad.inLine.creatives.creative[0].linear.adParameters.value);
             }
@@ -185,25 +194,66 @@ function handleVPTP(vptp, node_id) {
               console.log(err);
               return;
             }
-            console.log("Parsed this:");
+            console.log("Parsed ad object:");
             console.log(adobj);
-            ad_node_id = the_tree.create_node(slot_node_id,{ 'text':'['+condition+'] '+'some_ad'});
+            $.each(adobj.ad, function(idx, ad) {
+              var adtype;
+              if (condition == 'OnBeforeContent') {
+                adtype = 'preroll';
+              }
+              else if (condition == 'OnContentEnd') {
+                adtype = 'postroll';
+              }
+              else {
+                //midroll?
+                adtype = 'midroll';
+              }
+              ad_node_id = the_tree.create_node(slot_node_id,{ 'text': condition+' ad', 'type' : adtype});
+              if (adobj.ad[idx].inLine) {
+                error_node_id = the_tree.create_node(ad_node_id,{ 'text': '[ERROR] ' + adobj.ad[idx].inLine.error});
+                expectURL(error_node_id, adobj.ad[idx].inLine.error);
+    
+                impression_node_id = the_tree.create_node(ad_node_id,{'text': '[IMPRESSIONS]'});
+                if (adobj.ad[idx].inLine.impressions) {
+                    $.each(adobj.ad[idx].inLine.impressions, function(index, imp) {
+                      imp_node_id = the_tree.create_node(impression_node_id, {'text': imp.value});
+                      expectURL(imp_node_id, imp.value);
+                    });
+                }
+                if (adobj.ad[idx].inLine.creatives.creative) {
+                  $.each(adobj.ad[idx].inLine.creatives.creative, function(index,creative) {
+                    creatives_node_id = the_tree.create_node(ad_node_id,{'text': '[CREATIVES]'});
+                    $.each(creative.linear.mediaFiles.mediaFile, function(index, mediafile) {
+                      creative_node_id = the_tree.create_node(creatives_node_id,{'text': '['+ mediafile.type +'] ' + mediafile.value});
+                      expectURL(creative_node_id, mediafile.value);
+                    });
+                    tracking_node_id = the_tree.create_node(ad_node_id,{'text': '[TRACKINGEVENTS]'});
+                    $.each(creative.linear.trackingEvents.tracking, function(index, event) {
+                      event_node_id = the_tree.create_node(tracking_node_id,{'text': '['+ event.event +'] ' + event.value});
+                      expectURL(event_node_id, event.value);
+                    });
+                  });
+                }
+              }
+            });
           }
         });
         
         //slot tracking
-        st_node_id = the_tree.create_node(ip_node_id,{ 'text':'[SLOT TRACKING]', 'state':{'opened':'true'}});
+        st_node_id = the_tree.create_node(ip_node_id,{ 'text':'[SLOT TRACKING]'});
         console.log("Slot is currently:");
         console.log(slot);
-        $.each(slot.trackingEvents.tracking, function(tindex,event) {
-          t_node_id = the_tree.create_node(st_node_id,{ 'text':'['+event.event+'] '+ event.value});
-          expectURL(t_node_id, event.value);
-        });
+        if (slot.trackingEvents) {
+          $.each(slot.trackingEvents.tracking, function(tindex,event) {
+            t_node_id = the_tree.create_node(st_node_id,{ 'text':'['+event.event+'] '+ event.value});
+            expectURL(t_node_id, event.value);
+          });
+        }
       });
     });
   }
   if (vptp.trackingEvents) {
-    tracking_node_id = the_tree.create_node(node_id,{ 'text':'[GLOBAL TRACKING]', 'state':{'opened':'true'}});
+    tracking_node_id = the_tree.create_node(node_id,{ 'text':'[GLOBAL TRACKING]'});
     $.each(vptp.trackingEvents.tracking, function(index,obj) {
       event_node_id = the_tree.create_node(tracking_node_id,{ 'text':'['+obj.event+'] '+obj.value, });
       expectURL(event_node_id, obj.value);
@@ -218,14 +268,23 @@ function handleVAST(nodeSet, parent_node_id) {
     
     //if (tagname == "AD") { //Handle Multiple Ads in same response }
     
-    if ((tagname == "CREATIVES") || (tagname == "MEDIAFILES") || (tagname == "TRACKINGEVENTS") || (tagname == "VIDEOCLICKS")) {
-      node_id = the_tree.create_node(parent_node_id,{ 'text':'['+tagname+']', 'state':{'opened':'true'}});
+    if ((tagname == "CREATIVES") || (tagname == "MEDIAFILES") || (tagname == "TRACKINGEVENTS") || (tagname == "VIDEOCLICKS") || (tagname == "AD")) {
+      node_id = the_tree.create_node(parent_node_id,{ 'text':'['+tagname+']'});
     }
     else if (tagname == "ERROR" || tagname == "IMPRESSION") {
-      error_node_id = the_tree.create_node(parent_node_id, {'text':'['+tagname+']'});
-      node_id = the_tree.create_node(error_node_id,{ 'text':$(nodeSet[i]).text()});
-      the_tree.open_node(the_tree.get_parent(node_id));
-      expectURL(node_id, $(nodeSet[i]).text());
+      console.log("In error/impressions");
+      //This is breaking VAST right now
+      if ($(nodeSet[i]).text() != "") {
+        error_node_id = the_tree.create_node(parent_node_id, {'text':'['+tagname+']'});
+        node_id = the_tree.create_node(error_node_id,{ 'text':$(nodeSet[i]).text()});
+        the_tree.open_node(the_tree.get_parent(node_id));
+        expectURL(node_id, $(nodeSet[i]).text());        
+      }
+      else {
+        console.log("node text was empty: " + $(nodeSet[i]).text());
+        node_id = parent_node_id;
+      }
+      //for some reason
     }
     else if (tagname == "TRACKING") {
       node_id = the_tree.create_node(parent_node_id,{ 'text':'['+$(nodeSet[i]).attr("event")+'] '+$(nodeSet[i]).text()});
@@ -248,6 +307,10 @@ function handleVAST(nodeSet, parent_node_id) {
 }
 
 function expectURL(tree_node_id, url) {
+  if (url == "") {
+    console.log("Refusing to watch for emtpy URL");
+    return;
+  }
   if (url.indexOf("rnd=") > -1) {
     url = url.replace(/(\?|&)rnd=[^&]*($|&)/, function(match, g1, g2) {
       if (g1 == "&") {
@@ -258,8 +321,14 @@ function expectURL(tree_node_id, url) {
       }
     });    
   }
-  console.log("Expecting URL " + url);
-  watchlist.push({treenode: tree_node_id, url: url, status: "expect"});
+  list_index = findListIndexByURL(watchlist, url);
+  if (list_index == -1) {
+    watchlist.push({treenode: [tree_node_id], url: url, status: "expect"});
+  }
+  else {
+    entry = watchlist[list_index];
+    entry.treenode.push(tree_node_id);
+  }
   $('#jstree').jstree(true).get_node(tree_node_id, true).addClass("adspy_expect");
   $('#jstree').jstree(true).get_node(tree_node_id).li_attr["class"] += " adspy_expect";
 }
