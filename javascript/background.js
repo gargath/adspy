@@ -30,7 +30,7 @@ function buildHar(packets) {
   var har = {};
   har.log = {
     "version": "1.2",
-    "creator": {"name": "VASTly", "version":"1.0.0"},
+    "creator": {"name": "VASTly", "version":"0.1"},
     "browser": {"name": "Chrome", "version":"38"}
     };
   var entries = [];
